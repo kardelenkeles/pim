@@ -4,6 +4,7 @@ import com.product_information.pim.dto.request.CategoryCreateRequest;
 import com.product_information.pim.dto.request.CategoryUpdateRequest;
 import com.product_information.pim.dto.response.CategoryResponse;
 import com.product_information.pim.entity.Category;
+import com.product_information.pim.exception.BusinessException;
 import com.product_information.pim.exception.DuplicateResourceException;
 import com.product_information.pim.exception.ResourceNotFoundException;
 import com.product_information.pim.mapper.CategoryMapper;
@@ -17,7 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -59,8 +60,14 @@ public class CategoryServiceImpl implements CategoryService {
 
         if (request.getParentCategoryId() != null) {
             if (request.getParentCategoryId().equals(id)) {
-                throw new DuplicateResourceException("Category", "parentCategoryId", id);
+                throw new BusinessException("A category cannot be its own parent");
             }
+
+            // Check for circular dependency
+            if (wouldCreateCircularDependency(id, request.getParentCategoryId())) {
+                throw new BusinessException("Moving category would create a circular dependency");
+            }
+
             categoryRepository.findById(request.getParentCategoryId())
                     .orElseThrow(() -> new ResourceNotFoundException("Category", "id", request.getParentCategoryId()));
         }
@@ -172,5 +179,117 @@ public class CategoryServiceImpl implements CategoryService {
         categoryRepository.delete(category);
 
         log.info("Category deleted successfully with id: {}", id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CategoryResponse> getCategoryTree() {
+        log.info("Fetching complete category tree");
+
+        List<Category> rootCategories = categoryRepository.findRootCategories();
+        return rootCategories.stream()
+                .map(this::buildCategoryTree)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public CategoryResponse getCategoryTreeById(Integer id) {
+        log.info("Fetching category tree for id: {}", id);
+
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", id));
+
+        return buildCategoryTree(category);
+    }
+
+    @Override
+    public void reorder(Integer categoryId, Integer newOrder) {
+        log.info("Reordering category {} to order {}", categoryId, newOrder);
+
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId));
+
+        category.setOrder(newOrder);
+        categoryRepository.save(category);
+
+        log.info("Category reordered successfully");
+    }
+
+    @Override
+    public void move(Integer categoryId, Integer newParentId) {
+        log.info("Moving category {} to parent {}", categoryId, newParentId);
+
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId));
+
+        if (newParentId != null) {
+            if (newParentId.equals(categoryId)) {
+                throw new BusinessException("A category cannot be its own parent");
+            }
+
+            // Check for circular dependency
+            if (wouldCreateCircularDependency(categoryId, newParentId)) {
+                throw new BusinessException("Moving category would create a circular dependency");
+            }
+
+            categoryRepository.findById(newParentId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Category", "id", newParentId));
+        }
+
+        category.setParentCategoryId(newParentId);
+        categoryRepository.save(category);
+
+        log.info("Category moved successfully");
+    }
+
+    /**
+     * Recursively builds category tree with all descendants
+     */
+    private CategoryResponse buildCategoryTree(Category category) {
+        Long productCount = productRepository.countByCategoryId(category.getId());
+        CategoryResponse response = categoryMapper.toResponse(category, productCount);
+
+        List<Category> children = categoryRepository.findByParentCategoryId(category.getId());
+        if (!children.isEmpty()) {
+            List<CategoryResponse> childResponses = children.stream()
+                    .sorted(Comparator.comparing(c -> c.getOrder() != null ? c.getOrder() : Integer.MAX_VALUE))
+                    .map(this::buildCategoryTree)
+                    .collect(Collectors.toList());
+            response.setSubCategories(childResponses);
+        }
+
+        return response;
+    }
+
+    /**
+     * Checks if moving categoryId under newParentId would create a circular
+     * dependency
+     */
+    private boolean wouldCreateCircularDependency(Integer categoryId, Integer newParentId) {
+        if (newParentId == null) {
+            return false;
+        }
+
+        Set<Integer> visited = new HashSet<>();
+        Integer currentParentId = newParentId;
+
+        while (currentParentId != null) {
+            if (currentParentId.equals(categoryId)) {
+                return true;
+            }
+
+            if (visited.contains(currentParentId)) {
+                // Already visited, avoid infinite loop
+                return true;
+            }
+
+            visited.add(currentParentId);
+
+            Optional<Category> parent = categoryRepository.findById(currentParentId);
+            currentParentId = parent.map(Category::getParentCategoryId).orElse(null);
+        }
+
+        return false;
     }
 }

@@ -75,8 +75,30 @@ public class CategoryController {
 
     @GetMapping("/{id}/tree")
     public ResponseEntity<CategoryResponse> getCategoryTree(@PathVariable Integer id) {
-        CategoryResponse response = categoryService.getCategoryWithSubCategories(id);
+        CategoryResponse response = categoryService.getCategoryTreeById(id);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/tree")
+    public ResponseEntity<List<CategoryResponse>> getFullCategoryTree() {
+        List<CategoryResponse> response = categoryService.getCategoryTree();
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{id}/reorder")
+    public ResponseEntity<Void> reorder(
+            @PathVariable Integer id,
+            @RequestParam Integer order) {
+        categoryService.reorder(id, order);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{id}/move")
+    public ResponseEntity<Void> move(
+            @PathVariable Integer id,
+            @RequestParam(required = false) Integer parentId) {
+        categoryService.move(id, parentId);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")

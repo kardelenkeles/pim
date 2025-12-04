@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Map;
 
 public interface CategoryService {
 
@@ -27,6 +28,14 @@ public interface CategoryService {
     List<CategoryResponse> getSubCategories(Integer parentId);
 
     CategoryResponse getCategoryWithSubCategories(Integer id);
+
+    List<CategoryResponse> getCategoryTree();
+
+    CategoryResponse getCategoryTreeById(Integer id);
+
+    void reorder(Integer categoryId, Integer newOrder);
+
+    void move(Integer categoryId, Integer newParentId);
 
     void delete(Integer id);
 }
