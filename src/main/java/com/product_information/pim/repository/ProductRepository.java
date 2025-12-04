@@ -31,6 +31,20 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
             "LOWER(p.barcode) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     Page<Product> searchProducts(@Param("keyword") String keyword, Pageable pageable);
 
+    @Query("SELECT p FROM Product p WHERE " +
+            "(:keyword IS NULL OR LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(p.barcode) LIKE LOWER(CONCAT('%', :keyword, '%'))) AND " +
+            "(:status IS NULL OR p.status = :status) AND " +
+            "(:categoryId IS NULL OR p.categoryId = :categoryId) AND " +
+            "(:brandId IS NULL OR p.brandId = :brandId)")
+    Page<Product> searchProductsWithFilters(
+            @Param("keyword") String keyword,
+            @Param("status") ProductStatus status,
+            @Param("categoryId") Integer categoryId,
+            @Param("brandId") Integer brandId,
+            Pageable pageable);
+
     boolean existsByBarcode(String barcode);
 
     long countByStatus(ProductStatus status);

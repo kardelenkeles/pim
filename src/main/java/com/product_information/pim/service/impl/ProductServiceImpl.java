@@ -178,6 +178,21 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
+    public Page<ProductResponse> searchWithFilters(
+            String keyword,
+            ProductStatus status,
+            Integer categoryId,
+            Integer brandId,
+            Pageable pageable) {
+        log.info("Searching products with filters - keyword: {}, status: {}, categoryId: {}, brandId: {}",
+                keyword, status, categoryId, brandId);
+
+        return productRepository.searchProductsWithFilters(keyword, status, categoryId, brandId, pageable)
+                .map(product -> getFullProductResponse(product.getId()));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<ProductResponse> getByCategory(Integer categoryId) {
         log.info("Fetching products for category id: {}", categoryId);
 

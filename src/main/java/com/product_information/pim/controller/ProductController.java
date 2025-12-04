@@ -70,6 +70,18 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/search/advanced")
+    public ResponseEntity<Page<ProductResponse>> searchWithFilters(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) ProductStatus status,
+            @RequestParam(required = false) Integer categoryId,
+            @RequestParam(required = false) Integer brandId,
+            @PageableDefault(size = 20) Pageable pageable) {
+        Page<ProductResponse> response = productService.searchWithFilters(
+                keyword, status, categoryId, brandId, pageable);
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/status/{status}")
     public ResponseEntity<Page<ProductResponse>> getByStatus(
             @PathVariable ProductStatus status,

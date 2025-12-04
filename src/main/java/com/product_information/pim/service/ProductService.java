@@ -27,6 +27,13 @@ public interface ProductService {
 
     Page<ProductResponse> search(String keyword, Pageable pageable);
 
+    Page<ProductResponse> searchWithFilters(
+            String keyword,
+            ProductStatus status,
+            Integer categoryId,
+            Integer brandId,
+            Pageable pageable);
+
     List<ProductResponse> getByCategory(Integer categoryId);
 
     List<ProductResponse> getByBrand(Integer brandId);
