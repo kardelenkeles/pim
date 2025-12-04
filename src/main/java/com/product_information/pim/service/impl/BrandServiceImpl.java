@@ -117,6 +117,18 @@ public class BrandServiceImpl implements BrandService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Page<BrandResponse> search(String keyword, Pageable pageable) {
+        log.info("Searching brands with keyword: {}", keyword);
+
+        return brandRepository.searchByKeyword(keyword, pageable)
+                .map(brand -> {
+                    Long productCount = productRepository.countByBrandId(brand.getId());
+                    return brandMapper.toResponse(brand, productCount);
+                });
+    }
+
+    @Override
     public void delete(Integer id) {
         log.info("Deleting brand with id: {}", id);
 

@@ -61,6 +61,14 @@ public class BrandController {
         }
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<Page<BrandResponse>> search(
+            @RequestParam String keyword,
+            @PageableDefault(size = 20) Pageable pageable) {
+        Page<BrandResponse> response = brandService.search(keyword, pageable);
+        return ResponseEntity.ok(response);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
         brandService.delete(id);

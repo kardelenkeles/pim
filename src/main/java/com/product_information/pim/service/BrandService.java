@@ -22,5 +22,7 @@ public interface BrandService {
 
     Page<BrandResponse> getAll(Pageable pageable);
 
+    Page<BrandResponse> search(String keyword, Pageable pageable);
+
     void delete(Integer id);
 }
