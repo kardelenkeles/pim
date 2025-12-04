@@ -50,10 +50,10 @@ public class ProductAttributeServiceImpl implements ProductAttributeService {
         }
 
         ProductAttribute attribute = productAttributeMapper.toEntity(request);
-        attribute = productAttributeRepository.save(attribute);
+        ProductAttribute savedAttribute = productAttributeRepository.save(attribute);
 
-        log.info("Product attribute created successfully with id: {}", attribute.getId());
-        return productAttributeMapper.toResponse(attribute);
+        log.info("Product attribute created successfully with id: {}", savedAttribute.getId());
+        return productAttributeMapper.toResponse(savedAttribute);
     }
 
     @Override
@@ -85,10 +85,10 @@ public class ProductAttributeServiceImpl implements ProductAttributeService {
         }
 
         productAttributeMapper.updateEntity(attribute, request);
-        attribute = productAttributeRepository.save(attribute);
+        ProductAttribute updatedAttribute = productAttributeRepository.save(attribute);
 
         log.info("Product attribute updated successfully with id: {}", id);
-        return productAttributeMapper.toResponse(attribute);
+        return productAttributeMapper.toResponse(updatedAttribute);
     }
 
     @Override
