@@ -41,7 +41,9 @@ public class CategoryServiceImpl implements CategoryService {
 
         if (request.getParentCategoryId() != null) {
             categoryRepository.findById(request.getParentCategoryId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Category", "id", request.getParentCategoryId()));
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "Parent category not found with id: " + request.getParentCategoryId() +
+                                    ". Please create the parent category first or set parentCategoryId to null for a root category."));
         }
 
         Category category = categoryMapper.toEntity(request);
@@ -69,7 +71,9 @@ public class CategoryServiceImpl implements CategoryService {
             }
 
             categoryRepository.findById(request.getParentCategoryId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Category", "id", request.getParentCategoryId()));
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "Parent category not found with id: " + request.getParentCategoryId() +
+                                    ". Cannot move category to non-existent parent."));
         }
 
         categoryMapper.updateEntity(category, request);
