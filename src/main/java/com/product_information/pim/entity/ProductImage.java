@@ -25,7 +25,7 @@ public class ProductImage {
     @Column(name = "alt_text", length = 255)
     private String altText;
 
-    @Column(name = "order")
+    @Column(name = "\"order\"")
     private Integer order;
 
     @ManyToOne

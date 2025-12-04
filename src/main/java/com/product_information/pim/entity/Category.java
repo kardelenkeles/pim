@@ -33,7 +33,7 @@ public class Category {
     @Column(nullable = false, unique = true, length = 100)
     private String slug;
 
-    @Column(name = "order")
+    @Column(name = "\"order\"")
     private Integer order;
 
     @CreationTimestamp
