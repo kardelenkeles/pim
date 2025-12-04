@@ -14,28 +14,28 @@ import java.util.Optional;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Integer> {
-    
+
     Optional<Product> findByBarcode(String barcode);
-    
+
     List<Product> findByCategoryId(Integer categoryId);
-    
+
     List<Product> findByBrandId(Integer brandId);
-    
+
     List<Product> findByStatus(ProductStatus status);
-    
+
     Page<Product> findByStatus(ProductStatus status, Pageable pageable);
-    
+
     @Query("SELECT p FROM Product p WHERE " +
-           "LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-           "LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-           "LOWER(p.barcode) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+            "LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(p.barcode) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     Page<Product> searchProducts(@Param("keyword") String keyword, Pageable pageable);
-    
+
     boolean existsByBarcode(String barcode);
-    
+
     long countByStatus(ProductStatus status);
-    
+
     long countByCategoryId(Integer categoryId);
-    
+
     long countByBrandId(Integer brandId);
 }

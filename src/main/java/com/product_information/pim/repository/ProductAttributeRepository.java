@@ -9,12 +9,12 @@ import java.util.Optional;
 
 @Repository
 public interface ProductAttributeRepository extends JpaRepository<ProductAttribute, Integer> {
-    
+
     List<ProductAttribute> findByProductId(Integer productId);
-    
+
     Optional<ProductAttribute> findByProductIdAndKey(Integer productId, String key);
-    
+
     List<ProductAttribute> findByKey(String key);
-    
+
     void deleteByProductId(Integer productId);
 }

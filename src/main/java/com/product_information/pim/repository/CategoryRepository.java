@@ -10,13 +10,13 @@ import java.util.Optional;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Integer> {
-    
+
     Optional<Category> findBySlug(String slug);
-    
+
     List<Category> findByParentCategoryId(Integer parentCategoryId);
-    
+
     @Query("SELECT c FROM Category c WHERE c.parentCategoryId IS NULL ORDER BY c.order")
     List<Category> findRootCategories();
-    
+
     boolean existsBySlug(String slug);
 }
