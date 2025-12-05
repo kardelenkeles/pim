@@ -25,20 +25,20 @@ public class Product {
     @Column(nullable = false, unique = true, length = 50)
     private String barcode;
 
-    @Column(name = "category_id", nullable = false)
+    @Column(name = "category_id")
     private Integer categoryId;
 
-    @Column(name = "brand_id", nullable = false)
+    @Column(name = "brand_id")
     private Integer brandId;
 
-    @Column(nullable = false, length = 255)
+    @Column(length = 255)
     private String title;
 
     @Column(columnDefinition = "TEXT")
     private String description;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(length = 20)
     private ProductStatus status;
 
     @CreationTimestamp

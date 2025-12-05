@@ -20,13 +20,10 @@ public class ProductCreateRequest {
     @Size(max = 50, message = "Barcode must not exceed 50 characters")
     private String barcode;
 
-    @NotNull(message = "Category ID is required")
     private Integer categoryId;
 
-    @NotNull(message = "Brand ID is required")
     private Integer brandId;
 
-    @NotBlank(message = "Title is required")
     @Size(max = 255, message = "Title must not exceed 255 characters")
     private String title;
 

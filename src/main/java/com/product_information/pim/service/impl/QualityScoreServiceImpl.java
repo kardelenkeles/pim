@@ -29,9 +29,33 @@ public class QualityScoreServiceImpl implements QualityScoreService {
         int totalFields = 0;
         int filledFields = 0;
 
-        // Basic fields (required fields always count as filled if product exists)
-        totalFields += 5; // barcode, categoryId, brandId, title, status
-        filledFields += 5;
+        // Barcode (required - always filled)
+        totalFields++;
+        filledFields++;
+
+        // Title (optional but important)
+        totalFields++;
+        if (product.getTitle() != null && !product.getTitle().trim().isEmpty()) {
+            filledFields++;
+        }
+
+        // Category (optional)
+        totalFields++;
+        if (product.getCategoryId() != null) {
+            filledFields++;
+        }
+
+        // Brand (optional)
+        totalFields++;
+        if (product.getBrandId() != null) {
+            filledFields++;
+        }
+
+        // Status (optional)
+        totalFields++;
+        if (product.getStatus() != null) {
+            filledFields++;
+        }
 
         // Description (optional but important)
         totalFields++;
@@ -72,6 +96,10 @@ public class QualityScoreServiceImpl implements QualityScoreService {
 
         // Create detailed result JSON
         Map<String, Object> result = new HashMap<>();
+        result.put("hasTitle", product.getTitle() != null && !product.getTitle().trim().isEmpty());
+        result.put("hasCategory", product.getCategoryId() != null);
+        result.put("hasBrand", product.getBrandId() != null);
+        result.put("hasStatus", product.getStatus() != null);
         result.put("hasDescription", product.getDescription() != null && !product.getDescription().trim().isEmpty());
         result.put("attributeCount",
                 product.getProductAttributes() != null ? product.getProductAttributes().size() : 0);

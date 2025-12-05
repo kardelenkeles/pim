@@ -46,11 +46,15 @@ public class ProductServiceImpl implements ProductService {
             throw new DuplicateResourceException("Product", "barcode", request.getBarcode());
         }
 
-        brandRepository.findById(request.getBrandId())
-                .orElseThrow(() -> new ResourceNotFoundException("Brand", "id", request.getBrandId()));
+        if (request.getBrandId() != null) {
+            brandRepository.findById(request.getBrandId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Brand", "id", request.getBrandId()));
+        }
 
-        categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", request.getCategoryId()));
+        if (request.getCategoryId() != null) {
+            categoryRepository.findById(request.getCategoryId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Category", "id", request.getCategoryId()));
+        }
 
         Product product = productMapper.toEntity(request);
         Product savedProduct = productRepository.save(product);
