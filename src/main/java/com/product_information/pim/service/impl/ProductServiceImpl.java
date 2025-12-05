@@ -11,6 +11,7 @@ import com.product_information.pim.mapper.ProductImageMapper;
 import com.product_information.pim.mapper.ProductMapper;
 import com.product_information.pim.repository.*;
 import com.product_information.pim.service.ProductService;
+import com.product_information.pim.service.QualityScoreService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -35,6 +36,7 @@ public class ProductServiceImpl implements ProductService {
     private final QualityRepository qualityRepository;
     private final ProductMapper productMapper;
     private final ProductImageMapper productImageMapper;
+    private final QualityScoreService qualityScoreService;
 
     @Override
     public ProductResponse create(ProductCreateRequest request) {
@@ -66,6 +68,9 @@ public class ProductServiceImpl implements ProductService {
                     .collect(Collectors.toList());
             productImageRepository.saveAll(images);
         }
+
+        // Calculate and save quality score
+        qualityScoreService.updateQualityScore(savedProduct.getId());
 
         log.info("Product created successfully with id: {}", savedProduct.getId());
         return getFullProductResponse(savedProduct.getId());
@@ -116,6 +121,9 @@ public class ProductServiceImpl implements ProductService {
                 productImageRepository.saveAll(images);
             }
         }
+
+        // Recalculate quality score after update
+        qualityScoreService.updateQualityScore(id);
 
         log.info("Product updated successfully with id: {}", id);
         return getFullProductResponse(id);
