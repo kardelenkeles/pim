@@ -1,8 +1,10 @@
 package com.product_information.pim.service.impl;
 
+import com.product_information.pim.dto.response.QualityResponse;
 import com.product_information.pim.entity.Product;
 import com.product_information.pim.entity.Quality;
 import com.product_information.pim.exception.ResourceNotFoundException;
+import com.product_information.pim.mapper.QualityMapper;
 import com.product_information.pim.repository.ProductRepository;
 import com.product_information.pim.repository.QualityRepository;
 import com.product_information.pim.service.QualityScoreService;
@@ -22,6 +24,7 @@ public class QualityScoreServiceImpl implements QualityScoreService {
 
     private final ProductRepository productRepository;
     private final QualityRepository qualityRepository;
+    private final QualityMapper qualityMapper;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -123,5 +126,25 @@ public class QualityScoreServiceImpl implements QualityScoreService {
             log.error("Error updating quality score for product {}", productId, e);
             throw new RuntimeException("Failed to update quality score", e);
         }
+    }
+
+    @Override
+    public QualityResponse getQualityById(Integer id) {
+        log.info("Getting quality by id: {}", id);
+
+        Quality quality = qualityRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Quality", "id", id));
+
+        return qualityMapper.toResponse(quality);
+    }
+
+    @Override
+    public QualityResponse getQualityByProductId(Integer productId) {
+        log.info("Getting quality by product id: {}", productId);
+
+        Quality quality = qualityRepository.findByProductId(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Quality", "productId", productId));
+
+        return qualityMapper.toResponse(quality);
     }
 }

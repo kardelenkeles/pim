@@ -1,5 +1,6 @@
 package com.product_information.pim.service;
 
+import com.product_information.pim.dto.response.QualityResponse;
 import com.product_information.pim.entity.Product;
 
 public interface QualityScoreService {
@@ -18,4 +19,20 @@ public interface QualityScoreService {
      * @param productId Product ID
      */
     void updateQualityScore(Integer productId);
+
+    /**
+     * Get quality by ID
+     * 
+     * @param id Quality ID
+     * @return QualityResponse
+     */
+    QualityResponse getQualityById(Integer id);
+
+    /**
+     * Get quality by product ID
+     * 
+     * @param productId Product ID
+     * @return QualityResponse
+     */
+    QualityResponse getQualityByProductId(Integer productId);
 }
