@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class ProductImageResponse {
 
     private Integer id;
+    private Integer productId;
     private String imageUrl;
     private String altText;
     private Integer order;
