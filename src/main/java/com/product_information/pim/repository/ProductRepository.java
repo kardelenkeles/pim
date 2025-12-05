@@ -15,41 +15,27 @@ import java.util.Optional;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Integer> {
 
-    Optional<Product> findByBarcode(String barcode);
+        Optional<Product> findByBarcode(String barcode);
 
-    List<Product> findByCategoryId(Integer categoryId);
+        @Query("SELECT p FROM Product p WHERE " +
+                        "(:keyword IS NULL OR LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+                        "LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+                        "LOWER(p.barcode) LIKE LOWER(CONCAT('%', :keyword, '%'))) AND " +
+                        "(:status IS NULL OR p.status = :status) AND " +
+                        "(:categoryId IS NULL OR p.categoryId = :categoryId) AND " +
+                        "(:brandId IS NULL OR p.brandId = :brandId)")
+        Page<Product> searchProductsWithFilters(
+                        @Param("keyword") String keyword,
+                        @Param("status") ProductStatus status,
+                        @Param("categoryId") Integer categoryId,
+                        @Param("brandId") Integer brandId,
+                        Pageable pageable);
 
-    List<Product> findByBrandId(Integer brandId);
+        boolean existsByBarcode(String barcode);
 
-    List<Product> findByStatus(ProductStatus status);
+        long countByStatus(ProductStatus status);
 
-    Page<Product> findByStatus(ProductStatus status, Pageable pageable);
+        long countByCategoryId(Integer categoryId);
 
-    @Query("SELECT p FROM Product p WHERE " +
-            "LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "LOWER(p.barcode) LIKE LOWER(CONCAT('%', :keyword, '%'))")
-    Page<Product> searchProducts(@Param("keyword") String keyword, Pageable pageable);
-
-    @Query("SELECT p FROM Product p WHERE " +
-            "(:keyword IS NULL OR LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "LOWER(p.barcode) LIKE LOWER(CONCAT('%', :keyword, '%'))) AND " +
-            "(:status IS NULL OR p.status = :status) AND " +
-            "(:categoryId IS NULL OR p.categoryId = :categoryId) AND " +
-            "(:brandId IS NULL OR p.brandId = :brandId)")
-    Page<Product> searchProductsWithFilters(
-            @Param("keyword") String keyword,
-            @Param("status") ProductStatus status,
-            @Param("categoryId") Integer categoryId,
-            @Param("brandId") Integer brandId,
-            Pageable pageable);
-
-    boolean existsByBarcode(String barcode);
-
-    long countByStatus(ProductStatus status);
-
-    long countByCategoryId(Integer categoryId);
-
-    long countByBrandId(Integer brandId);
+        long countByBrandId(Integer brandId);
 }

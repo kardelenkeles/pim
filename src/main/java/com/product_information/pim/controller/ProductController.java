@@ -66,14 +66,6 @@ public class ProductController {
 
     @GetMapping("/search")
     public ResponseEntity<PageResponse<ProductResponse>> search(
-            @RequestParam String keyword,
-            @PageableDefault(size = 20) Pageable pageable) {
-        Page<ProductResponse> page = productService.search(keyword, pageable);
-        return ResponseEntity.ok(new PageResponse<>(page));
-    }
-
-    @GetMapping("/search/advanced")
-    public ResponseEntity<PageResponse<ProductResponse>> searchWithFilters(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) ProductStatus status,
             @RequestParam(required = false) Integer categoryId,
@@ -82,26 +74,6 @@ public class ProductController {
         Page<ProductResponse> page = productService.searchWithFilters(
                 keyword, status, categoryId, brandId, pageable);
         return ResponseEntity.ok(new PageResponse<>(page));
-    }
-
-    @GetMapping("/status/{status}")
-    public ResponseEntity<PageResponse<ProductResponse>> getByStatus(
-            @PathVariable ProductStatus status,
-            @PageableDefault(size = 20) Pageable pageable) {
-        Page<ProductResponse> page = productService.getByStatus(status, pageable);
-        return ResponseEntity.ok(new PageResponse<>(page));
-    }
-
-    @GetMapping("/category/{categoryId}")
-    public ResponseEntity<ApiResponse<ProductResponse>> getByCategory(@PathVariable Integer categoryId) {
-        List<ProductResponse> list = productService.getByCategory(categoryId);
-        return ResponseEntity.ok(new ApiResponse<>(list));
-    }
-
-    @GetMapping("/brand/{brandId}")
-    public ResponseEntity<ApiResponse<ProductResponse>> getByBrand(@PathVariable Integer brandId) {
-        List<ProductResponse> list = productService.getByBrand(brandId);
-        return ResponseEntity.ok(new ApiResponse<>(list));
     }
 
     @PatchMapping("/{id}/status")

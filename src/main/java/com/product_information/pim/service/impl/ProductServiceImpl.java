@@ -160,24 +160,6 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ProductResponse> getByStatus(ProductStatus status, Pageable pageable) {
-        log.info("Fetching products with status: {}", status);
-
-        return productRepository.findByStatus(status, pageable)
-                .map(product -> getFullProductResponse(product.getId()));
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Page<ProductResponse> search(String keyword, Pageable pageable) {
-        log.info("Searching products with keyword: {}", keyword);
-
-        return productRepository.searchProducts(keyword, pageable)
-                .map(product -> getFullProductResponse(product.getId()));
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public Page<ProductResponse> searchWithFilters(
             String keyword,
             ProductStatus status,
@@ -189,26 +171,6 @@ public class ProductServiceImpl implements ProductService {
 
         return productRepository.searchProductsWithFilters(keyword, status, categoryId, brandId, pageable)
                 .map(product -> getFullProductResponse(product.getId()));
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<ProductResponse> getByCategory(Integer categoryId) {
-        log.info("Fetching products for category id: {}", categoryId);
-
-        return productRepository.findByCategoryId(categoryId).stream()
-                .map(product -> getFullProductResponse(product.getId()))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<ProductResponse> getByBrand(Integer brandId) {
-        log.info("Fetching products for brand id: {}", brandId);
-
-        return productRepository.findByBrandId(brandId).stream()
-                .map(product -> getFullProductResponse(product.getId()))
-                .collect(Collectors.toList());
     }
 
     @Override

@@ -23,20 +23,12 @@ public interface ProductService {
 
     Page<ProductResponse> getAll(Pageable pageable);
 
-    Page<ProductResponse> getByStatus(ProductStatus status, Pageable pageable);
-
-    Page<ProductResponse> search(String keyword, Pageable pageable);
-
     Page<ProductResponse> searchWithFilters(
             String keyword,
             ProductStatus status,
             Integer categoryId,
             Integer brandId,
             Pageable pageable);
-
-    List<ProductResponse> getByCategory(Integer categoryId);
-
-    List<ProductResponse> getByBrand(Integer brandId);
 
     void delete(Integer id);
 
