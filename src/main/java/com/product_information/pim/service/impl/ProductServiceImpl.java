@@ -46,14 +46,18 @@ public class ProductServiceImpl implements ProductService {
             throw new DuplicateResourceException("Product", "barcode", request.getBarcode());
         }
 
-        if (request.getBrandId() != null) {
+        if (request.getBrandId() != null && request.getBrandId() > 0) {
             brandRepository.findById(request.getBrandId())
                     .orElseThrow(() -> new ResourceNotFoundException("Brand", "id", request.getBrandId()));
+        } else if (request.getBrandId() != null && request.getBrandId() <= 0) {
+            request.setBrandId(null);
         }
 
-        if (request.getCategoryId() != null) {
+        if (request.getCategoryId() != null && request.getCategoryId() > 0) {
             categoryRepository.findById(request.getCategoryId())
                     .orElseThrow(() -> new ResourceNotFoundException("Category", "id", request.getCategoryId()));
+        } else if (request.getCategoryId() != null && request.getCategoryId() <= 0) {
+            request.setCategoryId(null);
         }
 
         Product product = productMapper.toEntity(request);
@@ -93,14 +97,18 @@ public class ProductServiceImpl implements ProductService {
             }
         }
 
-        if (request.getBrandId() != null) {
+        if (request.getBrandId() != null && request.getBrandId() > 0) {
             brandRepository.findById(request.getBrandId())
                     .orElseThrow(() -> new ResourceNotFoundException("Brand", "id", request.getBrandId()));
+        } else if (request.getBrandId() != null && request.getBrandId() <= 0) {
+            request.setBrandId(null);
         }
 
-        if (request.getCategoryId() != null) {
+        if (request.getCategoryId() != null && request.getCategoryId() > 0) {
             categoryRepository.findById(request.getCategoryId())
                     .orElseThrow(() -> new ResourceNotFoundException("Category", "id", request.getCategoryId()));
+        } else if (request.getCategoryId() != null && request.getCategoryId() <= 0) {
+            request.setCategoryId(null);
         }
 
         productMapper.updateEntity(product, request);
@@ -214,8 +222,12 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "id", productId));
 
-        Category category = categoryRepository.findById(product.getCategoryId()).orElse(null);
-        Brand brand = brandRepository.findById(product.getBrandId()).orElse(null);
+        Category category = product.getCategoryId() != null
+                ? categoryRepository.findById(product.getCategoryId()).orElse(null)
+                : null;
+        Brand brand = product.getBrandId() != null
+                ? brandRepository.findById(product.getBrandId()).orElse(null)
+                : null;
         List<ProductAttribute> attributes = productAttributeRepository.findByProductId(productId);
         List<ProductImage> images = productImageRepository.findByProductIdOrderByOrderAsc(productId);
         Quality quality = qualityRepository.findByProductId(productId).orElse(null);
