@@ -39,11 +39,11 @@ CREATE TABLE product (
     brand_id INTEGER,
     title VARCHAR(255),
     description TEXT,
-    status VARCHAR(20) CHECK (status IN ('DRAFT', 'ACTIVE', 'INACTIVE', 'DISCONTINUED')),
+    status VARCHAR(20) DEFAULT 'DRAFT' CHECK (status IN ('DRAFT', 'ACTIVE', 'ARCHIVED')),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (category_id) REFERENCES category(id) ON DELETE CASCADE,
-    FOREIGN KEY (brand_id) REFERENCES brand(id) ON DELETE CASCADE
+    FOREIGN KEY (category_id) REFERENCES category(id) ON DELETE SET NULL,
+    FOREIGN KEY (brand_id) REFERENCES brand(id) ON DELETE SET NULL
 );
 
 -- Create Quality Table
