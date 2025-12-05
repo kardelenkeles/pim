@@ -104,8 +104,10 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Integer id) {
-        categoryService.delete(id);
+    public ResponseEntity<Void> delete(
+            @PathVariable Integer id,
+            @RequestParam(defaultValue = "cascade") String action) {
+        categoryService.delete(id, action);
         return ResponseEntity.noContent().build();
     }
 }

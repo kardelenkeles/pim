@@ -17,6 +17,8 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
     @Query("SELECT c FROM Category c WHERE c.parentCategoryId = :parentId ORDER BY c.order ASC")
     List<Category> findByParentCategoryId(@Param("parentId") Integer parentCategoryId);
 
+    List<Category> findByParentCategoryOrderByOrderAsc(Category parentCategory);
+
     @Query("SELECT c FROM Category c WHERE c.parentCategoryId IS NULL ORDER BY c.order ASC")
     List<Category> findRootCategories();
 

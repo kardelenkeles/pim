@@ -36,5 +36,5 @@ public interface CategoryService {
 
     void move(Integer categoryId, Integer newParentId);
 
-    void delete(Integer id);
+    void delete(Integer id, String action);
 }

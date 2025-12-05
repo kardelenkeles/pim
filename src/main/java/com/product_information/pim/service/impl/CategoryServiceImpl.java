@@ -174,15 +174,41 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public void delete(Integer id) {
-        log.info("Deleting category with id: {}", id);
+    public void delete(Integer id, String action) {
+        log.info("Deleting category with id: {} using action: {}", id, action);
 
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "id", id));
 
-        categoryRepository.delete(category);
+        List<Category> subcategories = categoryRepository.findByParentCategoryOrderByOrderAsc(category);
 
+        if (!subcategories.isEmpty()) {
+            if ("reassign".equals(action)) {
+                Category newParent = category.getParentCategory();
+                for (Category sub : subcategories) {
+                    sub.setParentCategory(newParent);
+                    sub.setParentCategoryId(newParent != null ? newParent.getId() : null);
+                }
+                categoryRepository.saveAll(subcategories);
+                log.info("Reassigned {} subcategories to parent: {}", subcategories.size(), 
+                        newParent != null ? newParent.getId() : "root");
+            } else {
+                deleteRecursively(category);
+                log.info("Category and all subcategories deleted recursively with id: {}", id);
+                return;
+            }
+        }
+
+        categoryRepository.delete(category);
         log.info("Category deleted successfully with id: {}", id);
+    }
+
+    private void deleteRecursively(Category category) {
+        List<Category> subcategories = categoryRepository.findByParentCategoryOrderByOrderAsc(category);
+        for (Category sub : subcategories) {
+            deleteRecursively(sub);
+        }
+        categoryRepository.delete(category);
     }
 
     @Override
