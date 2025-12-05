@@ -57,8 +57,8 @@ public class Product {
     @JoinColumn(name = "brand_id", insertable = false, updatable = false)
     private Brand brand;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    private List<Quality> qualities;
+    @OneToOne(mappedBy = "product", cascade = CascadeType.ALL)
+    private Quality quality;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<ProductAttribute> productAttributes;

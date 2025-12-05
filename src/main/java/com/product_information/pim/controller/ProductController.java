@@ -2,6 +2,8 @@ package com.product_information.pim.controller;
 
 import com.product_information.pim.dto.request.ProductCreateRequest;
 import com.product_information.pim.dto.request.ProductUpdateRequest;
+import com.product_information.pim.dto.response.ApiResponse;
+import com.product_information.pim.dto.response.PageResponse;
 import com.product_information.pim.dto.response.ProductResponse;
 import com.product_information.pim.enums.ProductStatus;
 import com.product_information.pim.service.ProductService;
@@ -54,52 +56,52 @@ public class ProductController {
             @RequestParam(required = false, defaultValue = "false") boolean paginated,
             @PageableDefault(size = 20) Pageable pageable) {
         if (paginated) {
-            Page<ProductResponse> response = productService.getAll(pageable);
-            return ResponseEntity.ok(response);
+            Page<ProductResponse> page = productService.getAll(pageable);
+            return ResponseEntity.ok(new PageResponse<>(page));
         } else {
-            List<ProductResponse> response = productService.getAll();
-            return ResponseEntity.ok(response);
+            List<ProductResponse> list = productService.getAll();
+            return ResponseEntity.ok(new ApiResponse<>(list));
         }
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Page<ProductResponse>> search(
+    public ResponseEntity<PageResponse<ProductResponse>> search(
             @RequestParam String keyword,
             @PageableDefault(size = 20) Pageable pageable) {
-        Page<ProductResponse> response = productService.search(keyword, pageable);
-        return ResponseEntity.ok(response);
+        Page<ProductResponse> page = productService.search(keyword, pageable);
+        return ResponseEntity.ok(new PageResponse<>(page));
     }
 
     @GetMapping("/search/advanced")
-    public ResponseEntity<Page<ProductResponse>> searchWithFilters(
+    public ResponseEntity<PageResponse<ProductResponse>> searchWithFilters(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) ProductStatus status,
             @RequestParam(required = false) Integer categoryId,
             @RequestParam(required = false) Integer brandId,
             @PageableDefault(size = 20) Pageable pageable) {
-        Page<ProductResponse> response = productService.searchWithFilters(
+        Page<ProductResponse> page = productService.searchWithFilters(
                 keyword, status, categoryId, brandId, pageable);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new PageResponse<>(page));
     }
 
     @GetMapping("/status/{status}")
-    public ResponseEntity<Page<ProductResponse>> getByStatus(
+    public ResponseEntity<PageResponse<ProductResponse>> getByStatus(
             @PathVariable ProductStatus status,
             @PageableDefault(size = 20) Pageable pageable) {
-        Page<ProductResponse> response = productService.getByStatus(status, pageable);
-        return ResponseEntity.ok(response);
+        Page<ProductResponse> page = productService.getByStatus(status, pageable);
+        return ResponseEntity.ok(new PageResponse<>(page));
     }
 
     @GetMapping("/category/{categoryId}")
-    public ResponseEntity<List<ProductResponse>> getByCategory(@PathVariable Integer categoryId) {
-        List<ProductResponse> response = productService.getByCategory(categoryId);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<ApiResponse<ProductResponse>> getByCategory(@PathVariable Integer categoryId) {
+        List<ProductResponse> list = productService.getByCategory(categoryId);
+        return ResponseEntity.ok(new ApiResponse<>(list));
     }
 
     @GetMapping("/brand/{brandId}")
-    public ResponseEntity<List<ProductResponse>> getByBrand(@PathVariable Integer brandId) {
-        List<ProductResponse> response = productService.getByBrand(brandId);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<ApiResponse<ProductResponse>> getByBrand(@PathVariable Integer brandId) {
+        List<ProductResponse> list = productService.getByBrand(brandId);
+        return ResponseEntity.ok(new ApiResponse<>(list));
     }
 
     @PatchMapping("/{id}/status")

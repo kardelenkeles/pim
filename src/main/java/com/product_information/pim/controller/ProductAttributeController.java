@@ -2,6 +2,7 @@ package com.product_information.pim.controller;
 
 import com.product_information.pim.dto.request.ProductAttributeRequest;
 import com.product_information.pim.dto.request.ProductAttributeUpdateRequest;
+import com.product_information.pim.dto.response.ApiResponse;
 import com.product_information.pim.dto.response.ProductAttributeResponse;
 import com.product_information.pim.service.ProductAttributeService;
 import jakarta.validation.Valid;
@@ -40,15 +41,15 @@ public class ProductAttributeController {
     }
 
     @GetMapping("/product/{productId}")
-    public ResponseEntity<List<ProductAttributeResponse>> getByProductId(@PathVariable Integer productId) {
-        List<ProductAttributeResponse> response = productAttributeService.getByProductId(productId);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<ApiResponse<ProductAttributeResponse>> getByProductId(@PathVariable Integer productId) {
+        List<ProductAttributeResponse> list = productAttributeService.getByProductId(productId);
+        return ResponseEntity.ok(new ApiResponse<>(list));
     }
 
     @GetMapping("/key/{key}")
-    public ResponseEntity<List<ProductAttributeResponse>> getByKey(@PathVariable String key) {
-        List<ProductAttributeResponse> response = productAttributeService.getByKey(key);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<ApiResponse<ProductAttributeResponse>> getByKey(@PathVariable String key) {
+        List<ProductAttributeResponse> list = productAttributeService.getByKey(key);
+        return ResponseEntity.ok(new ApiResponse<>(list));
     }
 
     @DeleteMapping("/{id}")

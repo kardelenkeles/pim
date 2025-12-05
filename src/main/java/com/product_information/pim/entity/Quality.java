@@ -39,7 +39,7 @@ public class Quality {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "product_id", insertable = false, updatable = false)
     private Product product;
 }

@@ -2,7 +2,9 @@ package com.product_information.pim.controller;
 
 import com.product_information.pim.dto.request.CategoryCreateRequest;
 import com.product_information.pim.dto.request.CategoryUpdateRequest;
+import com.product_information.pim.dto.response.ApiResponse;
 import com.product_information.pim.dto.response.CategoryResponse;
+import com.product_information.pim.dto.response.PageResponse;
 import com.product_information.pim.service.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -53,24 +55,24 @@ public class CategoryController {
             @RequestParam(required = false, defaultValue = "false") boolean paginated,
             @PageableDefault(size = 20) Pageable pageable) {
         if (paginated) {
-            Page<CategoryResponse> response = categoryService.getAll(pageable);
-            return ResponseEntity.ok(response);
+            Page<CategoryResponse> page = categoryService.getAll(pageable);
+            return ResponseEntity.ok(new PageResponse<>(page));
         } else {
-            List<CategoryResponse> response = categoryService.getAll();
-            return ResponseEntity.ok(response);
+            List<CategoryResponse> list = categoryService.getAll();
+            return ResponseEntity.ok(new ApiResponse<>(list));
         }
     }
 
     @GetMapping("/root")
-    public ResponseEntity<List<CategoryResponse>> getRootCategories() {
-        List<CategoryResponse> response = categoryService.getRootCategories();
-        return ResponseEntity.ok(response);
+    public ResponseEntity<ApiResponse<CategoryResponse>> getRootCategories() {
+        List<CategoryResponse> list = categoryService.getRootCategories();
+        return ResponseEntity.ok(new ApiResponse<>(list));
     }
 
     @GetMapping("/{id}/subcategories")
-    public ResponseEntity<List<CategoryResponse>> getSubCategories(@PathVariable Integer id) {
-        List<CategoryResponse> response = categoryService.getSubCategories(id);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<ApiResponse<CategoryResponse>> getSubCategories(@PathVariable Integer id) {
+        List<CategoryResponse> list = categoryService.getSubCategories(id);
+        return ResponseEntity.ok(new ApiResponse<>(list));
     }
 
     @GetMapping("/{id}/tree")
@@ -80,9 +82,9 @@ public class CategoryController {
     }
 
     @GetMapping("/tree")
-    public ResponseEntity<List<CategoryResponse>> getFullCategoryTree() {
-        List<CategoryResponse> response = categoryService.getCategoryTree();
-        return ResponseEntity.ok(response);
+    public ResponseEntity<ApiResponse<CategoryResponse>> getFullCategoryTree() {
+        List<CategoryResponse> list = categoryService.getCategoryTree();
+        return ResponseEntity.ok(new ApiResponse<>(list));
     }
 
     @PatchMapping("/{id}/reorder")

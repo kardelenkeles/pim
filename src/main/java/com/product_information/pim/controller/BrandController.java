@@ -2,7 +2,9 @@ package com.product_information.pim.controller;
 
 import com.product_information.pim.dto.request.BrandCreateRequest;
 import com.product_information.pim.dto.request.BrandUpdateRequest;
+import com.product_information.pim.dto.response.ApiResponse;
 import com.product_information.pim.dto.response.BrandResponse;
+import com.product_information.pim.dto.response.PageResponse;
 import com.product_information.pim.service.BrandService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/brands")
+@RequestMapping("/api/brands")
 @RequiredArgsConstructor
 public class BrandController {
 
@@ -53,20 +55,20 @@ public class BrandController {
             @RequestParam(required = false, defaultValue = "false") boolean paginated,
             @PageableDefault(size = 20) Pageable pageable) {
         if (paginated) {
-            Page<BrandResponse> response = brandService.getAll(pageable);
-            return ResponseEntity.ok(response);
+            Page<BrandResponse> page = brandService.getAll(pageable);
+            return ResponseEntity.ok(new PageResponse<>(page));
         } else {
-            List<BrandResponse> response = brandService.getAll();
-            return ResponseEntity.ok(response);
+            List<BrandResponse> list = brandService.getAll();
+            return ResponseEntity.ok(new ApiResponse<>(list));
         }
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Page<BrandResponse>> search(
+    public ResponseEntity<PageResponse<BrandResponse>> search(
             @RequestParam String keyword,
             @PageableDefault(size = 20) Pageable pageable) {
-        Page<BrandResponse> response = brandService.search(keyword, pageable);
-        return ResponseEntity.ok(response);
+        Page<BrandResponse> page = brandService.search(keyword, pageable);
+        return ResponseEntity.ok(new PageResponse<>(page));
     }
 
     @DeleteMapping("/{id}")
