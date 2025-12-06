@@ -31,6 +31,8 @@ public class QualityScoreServiceImpl implements QualityScoreService {
     public Integer calculateScore(Product product) {
         int totalFields = 0;
         int filledFields = 0;
+        int attributeCount = 0;
+        int filledAttributes = 0;
 
         // Barcode (required - always filled)
         totalFields++;
@@ -66,10 +68,14 @@ public class QualityScoreServiceImpl implements QualityScoreService {
             filledFields++;
         }
 
-        // Attributes (optional)
-        totalFields++;
+        // Attributes (dynamic, count each key/value pair)
         if (product.getProductAttributes() != null && !product.getProductAttributes().isEmpty()) {
-            filledFields++;
+            attributeCount = product.getProductAttributes().size();
+            filledAttributes = (int) product.getProductAttributes().stream()
+                    .filter(attr -> attr.getValue() != null && !attr.getValue().trim().isEmpty())
+                    .count();
+            totalFields += attributeCount;
+            filledFields += filledAttributes;
         }
 
         // Images (optional)
@@ -95,6 +101,13 @@ public class QualityScoreServiceImpl implements QualityScoreService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "id", productId));
 
+        int attributeCount = product.getProductAttributes() != null ? product.getProductAttributes().size() : 0;
+        int filledAttributes = product.getProductAttributes() != null
+                ? (int) product.getProductAttributes().stream()
+                        .filter(attr -> attr.getValue() != null && !attr.getValue().trim().isEmpty())
+                        .count()
+                : 0;
+
         Integer score = calculateScore(product);
 
         // Create detailed result JSON
@@ -104,8 +117,8 @@ public class QualityScoreServiceImpl implements QualityScoreService {
         result.put("hasBrand", product.getBrandId() != null);
         result.put("hasStatus", product.getStatus() != null);
         result.put("hasDescription", product.getDescription() != null && !product.getDescription().trim().isEmpty());
-        result.put("attributeCount",
-                product.getProductAttributes() != null ? product.getProductAttributes().size() : 0);
+        result.put("attributeCount", attributeCount);
+        result.put("filledAttributeCount", filledAttributes);
         result.put("imageCount", product.getProductImages() != null ? product.getProductImages().size() : 0);
         result.put("completenessPercentage", score);
 

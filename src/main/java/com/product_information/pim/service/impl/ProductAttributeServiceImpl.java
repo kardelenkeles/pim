@@ -11,6 +11,7 @@ import com.product_information.pim.mapper.ProductAttributeMapper;
 import com.product_information.pim.repository.ProductAttributeRepository;
 import com.product_information.pim.repository.ProductRepository;
 import com.product_information.pim.service.ProductAttributeService;
+import com.product_information.pim.service.QualityScoreService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ public class ProductAttributeServiceImpl implements ProductAttributeService {
     private final ProductAttributeRepository productAttributeRepository;
     private final ProductRepository productRepository;
     private final ProductAttributeMapper productAttributeMapper;
+    private final QualityScoreService qualityScoreService;
 
     @Override
     public ProductAttributeResponse create(ProductAttributeRequest request) {
@@ -51,6 +53,9 @@ public class ProductAttributeServiceImpl implements ProductAttributeService {
 
         ProductAttribute attribute = productAttributeMapper.toEntity(request);
         ProductAttribute savedAttribute = productAttributeRepository.save(attribute);
+
+        // Recalculate quality after attribute change
+        qualityScoreService.updateQualityScore(request.getProductId());
 
         log.info("Product attribute created successfully with id: {}", savedAttribute.getId());
         return productAttributeMapper.toResponse(savedAttribute);
@@ -86,6 +91,9 @@ public class ProductAttributeServiceImpl implements ProductAttributeService {
 
         productAttributeMapper.updateEntity(attribute, request);
         ProductAttribute updatedAttribute = productAttributeRepository.save(attribute);
+
+        // Recalculate quality after attribute change
+        qualityScoreService.updateQualityScore(attribute.getProductId());
 
         log.info("Product attribute updated successfully with id: {}", id);
         return productAttributeMapper.toResponse(updatedAttribute);
@@ -139,6 +147,9 @@ public class ProductAttributeServiceImpl implements ProductAttributeService {
 
         productAttributeRepository.delete(attribute);
 
+        // Recalculate quality after attribute change
+        qualityScoreService.updateQualityScore(attribute.getProductId());
+
         log.info("Product attribute deleted successfully with id: {}", id);
     }
 
@@ -151,6 +162,9 @@ public class ProductAttributeServiceImpl implements ProductAttributeService {
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "id", productId));
 
         productAttributeRepository.deleteByProductId(productId);
+
+        // Recalculate quality after attribute change
+        qualityScoreService.updateQualityScore(productId);
 
         log.info("All product attributes deleted successfully for product id: {}", productId);
     }
