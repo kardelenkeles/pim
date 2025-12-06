@@ -13,7 +13,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -91,7 +94,37 @@ public class DashboardServiceImpl implements DashboardService {
 
         try {
             List<Product> products = productRepository.findAll();
-            String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(products);
+
+            // Convert to simple map to avoid circular reference issues
+            List<Map<String, Object>> simpleProducts = products.stream()
+                    .map(p -> {
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("id", p.getId());
+                        map.put("barcode", p.getBarcode());
+                        map.put("title", p.getTitle());
+                        map.put("categoryId", p.getCategoryId());
+                        map.put("brandId", p.getBrandId());
+                        map.put("status", p.getStatus());
+                        map.put("description", p.getDescription());
+                        map.put("createdAt", p.getCreatedAt());
+                        map.put("updatedAt", p.getUpdatedAt());
+
+                        // Add counts for related entities
+                        if (p.getProductAttributes() != null) {
+                            map.put("attributeCount", p.getProductAttributes().size());
+                        }
+                        if (p.getProductImages() != null) {
+                            map.put("imageCount", p.getProductImages().size());
+                        }
+                        if (p.getQuality() != null) {
+                            map.put("qualityScore", p.getQuality().getScore());
+                        }
+
+                        return map;
+                    })
+                    .collect(Collectors.toList());
+
+            String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(simpleProducts);
 
             log.info("Products exported to JSON successfully: {} products", products.size());
             return json;
