@@ -12,6 +12,7 @@ import com.product_information.pim.repository.ProductAttributeRepository;
 import com.product_information.pim.repository.ProductRepository;
 import com.product_information.pim.service.ProductAttributeService;
 import com.product_information.pim.service.QualityScoreService;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,7 @@ public class ProductAttributeServiceImpl implements ProductAttributeService {
     private final ProductRepository productRepository;
     private final ProductAttributeMapper productAttributeMapper;
     private final QualityScoreService qualityScoreService;
+    private final EntityManager entityManager;
 
     @Override
     public ProductAttributeResponse create(ProductAttributeRequest request) {
@@ -145,10 +147,13 @@ public class ProductAttributeServiceImpl implements ProductAttributeService {
         ProductAttribute attribute = productAttributeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("ProductAttribute", "id", id));
 
+        Integer productId = attribute.getProductId();
+
         productAttributeRepository.delete(attribute);
+        productAttributeRepository.flush();
 
         // Recalculate quality after attribute change
-        qualityScoreService.updateQualityScore(attribute.getProductId());
+        qualityScoreService.updateQualityScore(productId);
 
         log.info("Product attribute deleted successfully with id: {}", id);
     }
@@ -161,7 +166,8 @@ public class ProductAttributeServiceImpl implements ProductAttributeService {
         productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "id", productId));
 
-        productAttributeRepository.deleteByProductId(productId);
+        int deletedCount = productAttributeRepository.deleteByProductId(productId);
+        log.info("Deleted {} attributes for product id: {}", deletedCount, productId);
 
         // Recalculate quality after attribute change
         qualityScoreService.updateQualityScore(productId);
